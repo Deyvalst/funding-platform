@@ -1,3 +1,4 @@
 # funding-platform
 SPA frontend project on ReactJS
-preview: ?
+
+preview: https://deyvalst.github.io/funding-platform/index.html
