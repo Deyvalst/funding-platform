@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<title>Donations platform</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="included/bootstrap.min.css">
+<script type="text/babel" data-type="module">
+
+export default function Content(){
+  return (
+  <><header className="shadow">
+  <div className="container">
+  <h2>Центр благотворительности</h2></div></header>
+  <main className="container">
+  <div className="row">
+  <div className="col">
+  <a href="releasing.html"><button className="btn btn-secondary p-2 lh-3">Запустить сбор</button></a>
+  <p></p><h4>Список активных сборов</h4><hr /><br />
+  <div><ol id="cardlist"><center><h3>Загрузка...</h3></center></ol>
+  </div></div></div>
+  </main>
+  </>
+  );
+}
+const root = ReactDOM.createRoot(document.getElementById('rootshow'));
+    root.render(<Content />);
+</script>
+</head>
+<body>
+<div id="rootshow"></div>
+</body>
+<style>
+body {
+	--bs-body-bg: lavender;
+	--bs-body-font-family: monospace;
+}
+header {
+	background: powderblue;
+	padding: 20px;
+	margin-bottom: 40px;
+}
+.funding_card {
+	padding: 15px;
+	background: lightsteelblue;
+	margin-bottom: 30px;
+}
+.status {
+	font-size: 20px;
+}
+.card_title {
+	font-size: 20px;
+	border-bottom: 2px solid black;
+}
+.form-control {
+	--bs-body-bg: white;
+}
+.over_wide {
+	width: 100%;
+}
+</style>
+</html>
