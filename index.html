@@ -2,32 +2,198 @@
 <html>
 <head>
 <title>Donations platform</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- <script src="https://unpkg.com/react@18/umd/react.development.js"></script> -->
+  <!-- <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script> -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="included/bootstrap.min.css">
 <script type="text/babel" data-type="module">
+import React, { useState, StrictMode } from 'https://esm.sh/react@18.2.0';
+    import { createRoot } from 'https://esm.sh/react-dom@18.2.0';
 
 export default function Content(){
+  var activeComponent = <OverviewPage interaction={refreshContent} />;
+  const [component, setComponent] = useState(activeComponent);
+	
+  function refreshContent(request) {
+    if (request == "inspect") {
+      activeComponent = <InspectingPage interaction={refreshContent} />;
+      setComponent(activeComponent);
+    } 
+    else if (request == "release") {
+      activeComponent = <ReleasingPage interaction={refreshContent} />;
+      setComponent(activeComponent);
+    }
+    else {
+      setComponent(activeComponent);
+    }
+  }
+	
   return (
-  <><header className="shadow">
-  <div className="container">
-  <h2>Центр благотворительности</h2></div></header>
-  <main className="container">
-  <div className="row">
-  <div className="col">
-  <a href="releasing.html"><button className="btn btn-secondary p-2 lh-3">Запустить сбор</button></a>
-  <p></p><h4>Список активных сборов</h4><hr /><br />
-  <div><ol id="cardlist"><center><h3>Загрузка...</h3></center></ol>
-  </div></div></div>
-  </main>
+    <>{component}</>
+  );
+}
+  
+function OverviewPage({interaction}){
+
+  function buttonEffect(argument) {
+    interaction(argument);
+  }
+  
+  return (
+    <><header className="shadow">
+    <div className="container">
+    <h2>Центр благотворительности</h2></div></header>
+    <main className="container">
+    <div className="row">
+    <div className="col">
+    <OpenButton effect={buttonEffect} />
+    <p></p><h4>Список активных сборов</h4><hr /><br />
+    <div><ol id="cardlist">
+	<li><div class="funding_card"><p class="card_title" align="center">{0}</p><div class="row"><div class="col-sm-9 col-lg-10"><span class="status">сумма: {1}/{2}</span></div>
+	<div class="col"><InspectButton effect={buttonEffect} /></div></div></div></li>
+	<center><h3>Загрузка...</h3></center></ol>
+    </div></div></div>
+    </main>
   </>
   );
 }
-const root = ReactDOM.createRoot(document.getElementById('rootshow'));
-    root.render(<Content />);
+
+function InspectingPage({interaction}){
+
+  function buttonEffect(argument) {
+    interaction(argument);
+  }
+  
+  return (
+    <><header className="shadow">
+	<div className="container"><h2>Детали сбора</h2></div></header>
+    <main className="container">
+    <h4 id="funding_title">Загрузка</h4>
+    <hr /><br />
+    <form id="donation_data"><div className="row"><div className="col-5"><ul id="details"><li>Загрузка</li>
+    </ul></div>
+    <div className="col"><div className="row"><h4>Данные для перевода</h4><p></p><div className="col"><span>Отправитель</span>
+    <input className="form-control" type="text" maxlength={36} required></input></div>
+    <div className="col"><span>Сумма</span>
+    <input className="form-control" type="number" min={1} max={5000000} required></input></div></div></div></div>
+    <span>Обращение</span><textarea className="form-control" type="text" placeholder="Необязательно"></textarea><p></p>
+    <center><DonateButton effect={buttonEffect} />
+	</center></form><p></p>
+	<div><center><ReturnInspectButton effect={buttonEffect} /></center></div></main>
+  </>
+  );
+}
+
+function ReleasingPage({interaction}){
+  
+  function buttonEffect(argument) {
+    interaction(argument);
+  }
+
+  return (
+  <><header className="shadow"><div className="container"><h2>Запуск сбора</h2></div></header>
+    <main className="container">
+    <form id="funding_data">
+    <center><p><span>Название</span><br /><input className="form-control form-control-lg" type="text" min="8" maxlength="75" required /></p>
+    <div className="row"><div className="col-3 col-md-2"><p></p>
+    <ReturnReleaseButton effect={buttonEffect} /></div>
+    <div className="col-5 col-md-4"><span>Владелец</span><br /><input className="form-control" type="text" min="4" maxlength="36" required /></div>
+    <div className="col-4"><span>Целевая сумма</span><br />
+    <input className="form-control" type="number" min="2000" max="9999999" value="2000" required /></div>
+    <div className="col-3 col-md-2"><p></p><ReleaseButton effect={buttonEffect} />
+    </div></div></center>
+    </form>
+    </main>
+  </>
+  );
+}
+
+function ReturnReleaseButton({effect}){
+
+  function handleClick(){
+    effect("home");
+  }
+  
+  return (
+    <button type="button" className="btn btn-secondary p-2 lh-2 over_wide" onClick={handleClick}>Обратно</button>
+  );
+}
+
+function ReturnInspectButton({effect}){
+
+  function handleClick(){
+    effect("home");
+  }
+  
+  return (
+    <button type="button" className="btn btn-secondary p-2 lh-2" onClick={handleClick}>Обратно</button>
+  );
+}
+
+function OpenButton({effect}){
+
+  function handleClick(){
+    effect("release");
+  }
+  
+  return (
+    <button className="btn btn-secondary p-2 lh-3" onClick={handleClick}>Запустить сбор</button>
+  );
+}
+
+function InspectButton({effect}){
+
+  function handleClick(){
+    effect("inspect");
+  }
+  
+  return (
+    <button className="btn btn-light p-2 lh-1 shadow" onClick={handleClick}>Просмотр</button>
+  );
+}
+
+function ReleaseButton({effect}){
+
+  function handleClick(){
+    var enterform = document.forms["funding_data"];
+    if(enterform.checkValidity()) {
+      effect("home");
+    } 
+    else {
+      enterform.reportValidity();
+    }
+  }
+  
+  return (
+    <button className="btn btn-primary p-2 lh-2 over_wide" onClick={handleClick}>Начать</button>
+  );
+}
+
+function DonateButton({effect}){
+
+  function handleClick(){
+    var enterform = document.forms["donation_data"];
+    if(enterform.checkValidity()) {
+      effect("home");
+    } 
+    else {
+      enterform.reportValidity();
+    }
+  }
+  
+  return (
+    <button id="donating" className="btn btn-primary p-2 lh-3">Пожертвовать</button>
+  );
+}
+
+const root = createRoot(document.getElementById('rootshow'));
+root.render(
+  <StrictMode>
+  <Content />
+  </StrictMode>
+  );
 </script>
 </head>
 <body>
@@ -61,5 +227,10 @@ header {
 .over_wide {
 	width: 100%;
 }
+@media (max-width: 767px){
+.row .col-5 {
+	padding-left: 0;
+	padding-right: 0;
+}}
 </style>
 </html>
