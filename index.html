@@ -13,21 +13,23 @@ import React, { useState, StrictMode } from 'https://esm.sh/react@18.2.0';
     import { createRoot } from 'https://esm.sh/react-dom@18.2.0';
 
 export default function Content(){
-  var activeComponent = <OverviewPage interaction={refreshContent} />;
+  var activeComponent = <ProfilePage interaction={refreshContent} />;
   const [component, setComponent] = useState(activeComponent);
 	
   function refreshContent(request) {
     if (request == "inspect") {
       activeComponent = <InspectingPage interaction={refreshContent} />;
-      setComponent(activeComponent);
     } 
     else if (request == "release") {
       activeComponent = <ReleasingPage interaction={refreshContent} />;
-      setComponent(activeComponent);
     }
-    else {
-      setComponent(activeComponent);
+	else if (request == "archive") {
+      activeComponent = <RestPage interaction={refreshContent} />;
     }
+	else {
+	  activeComponent = <OverviewPage interaction={refreshContent} />;
+    }
+  setComponent(activeComponent);
   }
 	
   return (
@@ -41,10 +43,24 @@ function OverviewPage({interaction}){
     interaction(argument);
   }
   
+  function continues() {
+	if (document.forms["loginform"].checkValidity()){
+	interaction("release");}
+	else {
+	document.forms["loginform"].reportValidity();
+	}
+  }
+  
   return (
     <><header className="shadow">
     <div className="container">
     <h2>Центр благотворительности</h2></div></header>
+	<dialog id="login"><div class="row"><div className="col-10"><h4>Авторизация</h4></div><div className="col"><CloseMark /></div><p><hr /><span>Электронная почта</span>
+    <form id="loginform"><input className="form-control" type="text" maxlength={30} required></input>
+	<span>Пароль</span>
+    <input className="form-control" type="password" maxlength="20" required></input>
+	<button type="button" className="btn btn-primary p-2 lh-2" onClick={continues}>Продолжить</button></form>
+	</p></div></dialog>
     <main className="container">
     <div className="row">
     <div className="col">
@@ -52,6 +68,32 @@ function OverviewPage({interaction}){
     <p></p><h4>Список активных сборов</h4><hr /><br />
     <div><ol id="cardlist">
 	<li><div class="funding_card"><p class="card_title" align="center">{0}</p><div class="row"><div class="col-sm-9 col-lg-10"><span class="status">сумма: {1}/{2}</span></div>
+	<div class="col"><InspectButton effect={buttonEffect} /></div></div></div></li>
+	<center><h3>Загрузка...</h3><br /><SwitchButton effect={buttonEffect} /></center></ol>
+    </div></div></div>
+    </main>
+  </>
+  );
+}
+
+function RestPage({interaction}){
+
+  function buttonEffect(argument) {
+    interaction(argument);
+  }
+  
+  return (
+    <><header className="shadow">
+    <div className="container">
+    <h2>Центр благотворительности</h2></div></header>
+    <main className="container">
+    <div className="row">
+    <div className="col-md-2">
+    <ReturnReleaseButton effect={buttonEffect} /></div></div>
+	<div className="row"><div className="col">
+    <p></p><h4>Закрытые сборы</h4><hr /><br />
+    <div><ol id="cardlist">
+	<li><div class="funding_card"><p class="card_title" align="center">{0}</p><div class="row"><div class="col-sm-9 col-lg-10"><span class="status">Собрано к 10.10.2000</span></div>
 	<div class="col"><InspectButton effect={buttonEffect} /></div></div></div></li>
 	<center><h3>Загрузка...</h3></center></ol>
     </div></div></div>
@@ -76,8 +118,9 @@ function InspectingPage({interaction}){
     </ul></div>
     <div className="col"><div className="row"><h4>Данные для перевода</h4><p></p><div className="col"><span>Отправитель</span>
     <input className="form-control" type="text" maxlength={36} required></input></div>
-    <div className="col"><span>Сумма</span>
-    <input className="form-control" type="number" min={1} max={5000000} required></input></div></div></div></div>
+    <div className="col"><span>Сумма </span><select><option>₸ тенге</option><option>€ евро</option><option>$ доллар</option><option>₽ рубль</option><option>¥ йен</option><option>₿ биткоин</option>
+	</select><input className="form-control" type="number" min={1} max={5000000} required></input>
+	</div></div></div></div>
     <span>Обращение</span><textarea className="form-control" type="text" placeholder="Необязательно"></textarea><p></p>
     <center><DonateButton effect={buttonEffect} />
 	</center></form><p></p>
@@ -94,17 +137,57 @@ function ReleasingPage({interaction}){
 
   return (
   <><header className="shadow"><div className="container"><h2>Запуск сбора</h2></div></header>
+    <dialog id="terms"><div class="row"><div className="col-10"><h4>Условия пользования</h4></div><div className="col"><CloseMark /></div><p><hr />Пользуясь услугами сервиса вы автоматически соглашаетесь с условиями пользовательского соглашения</p></div></dialog>
     <main className="container">
     <form id="funding_data">
     <center><p><span>Название</span><br /><input className="form-control form-control-lg" type="text" min="8" maxlength="75" required /></p>
-    <div className="row"><div className="col-3 col-md-2"><p></p>
-    <ReturnReleaseButton effect={buttonEffect} /></div>
-    <div className="col-5 col-md-4"><span>Владелец</span><br /><input className="form-control" type="text" min="4" maxlength="36" required /></div>
-    <div className="col-4"><span>Целевая сумма</span><br />
+    <div className="row"><div className="col-md-1"><p></p>
+    <TermsButton effect={buttonEffect} /></div><div className="col-md-1 col-sm-2" ><p></p><ReturnReleaseButton effect={buttonEffect} /></div>
+    <div className="col-md-4 col-sm-3"><span>Владелец</span><br /><input className="form-control" type="text" min="4" maxlength="36" required /></div>
+    <div className="col-md-4 col-sm-3"><span>Целевая сумма</span><br />
     <input className="form-control" type="number" min="2000" max="9999999" value="2000" required /></div>
-    <div className="col-3 col-md-2"><p></p><ReleaseButton effect={buttonEffect} />
+    <div className="col-md-2 col-sm-1"><p></p><ReleaseButton effect={buttonEffect} />
     </div></div></center>
     </form>
+    </main>
+  </>
+  );
+}
+
+function ProfilePage({interaction}){
+
+  function buttonEffect(argument) {
+    interaction(argument);
+  }
+  
+  function saved() {
+	alert("Изменения сохранены");
+  }
+  
+  function toReleasePage() {
+	interaction("release");
+  }
+  
+  return (
+    <><header className="shadow">
+    <div className="container">
+    <h2>Личный кабинет</h2></div></header>
+    <main className="container">
+    <div className="row">
+    <div className="col">
+    <details><summary><h3>Настройки</h3></summary><hr />
+	<form><span>Псевдоним</span><br /><input className="form-control" type="text" min="4" maxlength="36" value="Пользователь" required />
+	<span>Номер телефона</span><br /><input className="form-control" type="number" min="1000000" maxlength="999999999999" value="77009999090" required />
+	<span>Номер карты</span><br /><input className="form-control" type="text" maxlength="20" value="1000200030004000" required /><p />
+	<button type="button" className="btn btn-primary p-2 lh-2" onClick={saved}>Применить</button></form><br /></details><details><summary><h3>Безопасность</h3></summary><hr />
+	<form><span>Пароль</span><br /><input className="form-control" type="password" min="4" maxlength="20" value="123456" required />
+	<span>Почта</span><br /><input className="form-control" type="text" min="8" maxlength="30" value="exmaple@my.xyz" required /><p />
+	<button type="button" className="btn btn-primary p-2 lh-2" onClick={saved}>Применить</button></form><br /></details><details><summary><h3>Ваши сборы</h3></summary><hr /><ul><button className="btn btn-secondary p-2 lh-3" onClick={toReleasePage}>Новый сбор</button><p /></ul>
+	<ol><li><div class="funding_card"><p class="card_title" align="center">{0}</p><div class="row"><div class="col-md-7"><button type="button" className="btn btn-primary p-2 lh-2">Скрыть</button></div><div class="col-md-4"><span class="status">сумма: {1}/{2}</span></div>
+	<div class="col"><button disabled type="button" className="btn btn-primary p-2 lh-2">Вывести</button></div></div></div></li>
+	<li><div class="funding_card"><p class="card_title" align="center">{0} <sup>(Скрыт)</sup></p><div class="row"><div class="col-md-7"><button type="button" className="btn btn-primary p-2 lh-2">Показать</button></div><div class="col-md-4"><span class="status">Собрано к 10.10.2000</span></div>
+	<div class="col"><button type="button" className="btn btn-primary p-2 lh-2">Вывести</button></div></div></div></li></ol>
+	</details><p /><LogoutButton effect={buttonEffect} /></div></div>
     </main>
   </>
   );
@@ -117,7 +200,7 @@ function ReturnReleaseButton({effect}){
   }
   
   return (
-    <button type="button" className="btn btn-secondary p-2 lh-2 over_wide" onClick={handleClick}>Обратно</button>
+    <button type="button" className="btn btn-secondary p-2 lh-2" onClick={handleClick}>Обратно</button>
   );
 }
 
@@ -132,14 +215,58 @@ function ReturnInspectButton({effect}){
   );
 }
 
+function LogoutButton({effect}){
+
+  function handleClick(){
+    effect("home");
+  }
+  
+  return (
+    <button type="button" className="btn btn-secondary p-2 lh-2" onClick={handleClick}>Выйти</button>
+  );
+}
+
+function TermsButton({effect}){
+
+  function handleClick(){
+    document.getElementById("terms").showModal();
+  }
+  
+  return (
+    <button type="button" className="btn btn-secondary p-2 lh-2" onClick={handleClick}>Правила</button>
+  );
+}
+
 function OpenButton({effect}){
 
   function handleClick(){
-    effect("release");
+    document.getElementById("login").showModal();
   }
   
   return (
     <button className="btn btn-secondary p-2 lh-3" onClick={handleClick}>Запустить сбор</button>
+  );
+}
+
+function CloseMark({effect}){
+
+  function handleClick(){
+    document.getElementById("login").close();
+    document.getElementById("terms").close();
+  }
+  
+  return (
+    <div className="col-6 text-end switch">
+    <button className="btn btn-secondary rounded-circle p-1 lh-2" type="button" onClick={handleClick}>
+      <svg xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      fill="currentColor" 
+      className="bi bi-x" 
+      viewBox="0 0 16 16" >
+      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"/>
+      </svg></button>
+    </div>
   );
 }
 
@@ -167,7 +294,7 @@ function ReleaseButton({effect}){
   }
   
   return (
-    <button className="btn btn-primary p-2 lh-2 over_wide" onClick={handleClick}>Начать</button>
+    <button className="btn btn-primary p-2 lh-2" onClick={handleClick}>Начать</button>
   );
 }
 
@@ -185,6 +312,17 @@ function DonateButton({effect}){
   
   return (
     <button id="donating" className="btn btn-primary p-2 lh-3">Пожертвовать</button>
+  );
+}
+
+function SwitchButton({effect}){
+
+  function handleClick(){
+    effect("archive");
+  }
+  
+  return (
+    <button className="btn btn-secondary p-2 lh-3" onClick={handleClick}>Остальное</button>
   );
 }
 
@@ -223,6 +361,9 @@ header {
 }
 .form-control {
 	--bs-body-bg: white;
+}
+details h3 {
+	display: inline;
 }
 .over_wide {
 	width: 100%;
